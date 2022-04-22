@@ -38,7 +38,7 @@ public class SearchUtils {
         return resultIndex;
     }
 
-    public static List<Map.Entry<Integer, String>> AroundSearch(List<Map.Entry<Integer, String>> values, String keyWord, int startIndex){
+    public static List<Map.Entry<Integer, String>> SearchAroundIndex(List<Map.Entry<Integer, String>> values, String keyWord, int startIndex){
 
         List<Map.Entry<Integer, String>> leftPart = new ArrayList<>();
         List<Map.Entry<Integer, String>> rightPart = new ArrayList<>();

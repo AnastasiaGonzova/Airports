@@ -11,35 +11,35 @@ public class Main {
 
     public static void main(String[] args) throws IOException{
 
-        Map<String, Object> data;
+        Map<String, Object> dataFromYaml;
 
         try{
             InputStream ymlStream = new FileInputStream(new File(YAML_FILE_PATH));
 
             Yaml yaml = new Yaml();
-            data = yaml.load(ymlStream);
+            dataFromYaml = yaml.load(ymlStream);
         } catch (IOException e) {
             throw new FileNotFoundException("File on the path \"" + YAML_FILE_PATH + "\" does not exist");
         }
 
-        int needColumn;
+        int needColumnNumber;
         if(args.length == 0 || args[0] == null){
-            needColumn = (Integer) data.get(COLUMN_NUMBER_KEY);
+            needColumnNumber = (Integer) dataFromYaml.get(COLUMN_NUMBER_KEY);
         } else {
-            needColumn = Integer.parseInt(args[0]);
+            needColumnNumber = Integer.parseInt(args[0]);
         }
 
-        List<Map.Entry<Integer, String>> values = FileUtils.Reading((String) data.get(FILE_NAME_KEY), needColumn);
+        List<Map.Entry<Integer, String>> values = FileUtils.Reading((String) dataFromYaml.get(FILE_NAME_KEY), needColumnNumber);
 
         System.out.print("Enter the key word: ");
         Scanner in = new Scanner(System.in);
         String keyWord = in.nextLine();
 
         if(values.size() == 0){
-            long start = System.currentTimeMillis();
-            long end = System.currentTimeMillis();
+            long startTime = System.currentTimeMillis();
+            long endTime = System.currentTimeMillis();
             System.out.println("Result: No result\n");
-            System.out.println("Lines: 0, Time: " + (end-start) + " ms");
+            System.out.println("Lines: 0, Time: " + (endTime-startTime) + " ms");
             return;
         }
 
@@ -50,39 +50,39 @@ public class Main {
             }
         });
 
-        long start = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
 
-        int resultIndex = SearchUtils.BinarySearch(values, keyWord);
+        int startIndex = SearchUtils.BinarySearch(values, keyWord);
 
-        if(resultIndex > values.size()) {
-            long end = System.currentTimeMillis();
+        if(startIndex > values.size()) {
+            long endTime = System.currentTimeMillis();
             System.out.println("Result: No result\n");
-            System.out.println("Lines: 0, Time: " + (end-start) + " ms");
+            System.out.println("Lines: 0, Time: " + (endTime-startTime) + " ms");
             return;
         }
 
-        List<Map.Entry<Integer, String>> finalResult = SearchUtils.AroundSearch(values, keyWord, resultIndex);
+        List<Map.Entry<Integer, String>> filteredValues = SearchUtils.SearchAroundIndex(values, keyWord, startIndex);
 
 
-        List<Integer> keys = new ArrayList<>();
-        for(Map.Entry<Integer, String> value : finalResult){
-            keys.add(value.getKey());
+        List<Integer> keysOfFilteredValues = new ArrayList<>();
+        for(Map.Entry<Integer, String> value : filteredValues){
+            keysOfFilteredValues.add(value.getKey());
         }
 
-        Map<Integer, String[]> allInform = FileUtils.SearchInFile(keys, (String) data.get(FILE_NAME_KEY));
-        long end = System.currentTimeMillis();
+        Map<Integer, String[]> allInformOfFilteredValues = FileUtils.ReadingByKeys(keysOfFilteredValues, (String) dataFromYaml.get(FILE_NAME_KEY));
+        long endTime = System.currentTimeMillis();
 
 
         System.out.println("\nResult: \n");
 
-        for(int i = 0; i < allInform.size(); i++){
-            for (String cell : allInform.get(i)) {
+        for(int i = 0; i < allInformOfFilteredValues.size(); i++){
+            for (String cell : allInformOfFilteredValues.get(i)) {
                 System.out.print(cell + " " );
             }
             System.out.println();
         }
 
-        System.out.println("\nLines: " + allInform.size() +", Time: " + (end-start) + " ms");
+        System.out.println("\nLines: " + allInformOfFilteredValues.size() +", Time: " + (endTime-startTime) + " ms");
 
     }
 }
